@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+.schema/
+.venv/
+venv/
+.env
+build/
+dist/
+*.egg-info/
+generated-cache/
+generation/
+tests/live-data/
