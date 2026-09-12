@@ -35,7 +35,7 @@ For dictionary lookup, select **Free dictionary**, type an English word, and pre
 
 Lookup uses [Free Dictionary API](https://dictionaryapi.dev/) over HTTPS and sends only the entered word. It requires internet access and may not cover every word or multiword expression. On a failed lookup, you can retry or enter a definition manually. Saved definitions remain available offline. Dictionary responses do not always include example sentences; the app does not invent them.
 
-Use the notebook for longer writing. Model examples support self-assessment; automatic grammar or usage correction is not included.
+Use the notebook for longer writing. After saving an entry, the suggested words refresh and prefer words outside the previous combination. With more than three vocabulary items, the next combination always changes. Model examples support self-assessment; automatic grammar or usage correction is not included.
 
 ## Local data
 

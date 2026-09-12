@@ -1,6 +1,5 @@
 """Wordcraft — an offline desktop vocabulary practice space."""
 import os
-import random
 import sqlite3
 # tkinter is Python's built-in library for creating desktop graphical interfaces.
 import tkinter as tk
@@ -12,6 +11,7 @@ from pathlib import Path
 from tkinter import filedialog, messagebox
 
 from storage import Store
+from notebook_suggestions import choose_suggestions
 
 BG = '#F5F3EE'
 PAPER = '#FFFFFF'
@@ -315,8 +315,9 @@ class App(tk.Tk):
 
     def notebook(self):
         self.page('Writing notebook', 'Give your words a life.', 'Write a short paragraph. Read it aloud, then check whether your phrases sound natural.')
-        suggestions = random.sample(list(self.store.words()), min(3, self.store.stats()['words']))
-        self.label(self.content, 'TRY USING:  ' + '  ·  '.join(w['word'] for w in suggestions), 11, GREEN, wraplength=700, bold=True).pack(anchor='w', pady=(0, 12))
+        suggestions = choose_suggestions(self.store.words())
+        suggestion_label = self.label(self.content, 'TRY USING:  ' + '  ·  '.join(w['word'] for w in suggestions), 11, GREEN, wraplength=700, bold=True)
+        suggestion_label.pack(anchor='w', pady=(0, 12))
         editor = tk.Text(self.content, height=7, wrap='word', bg=PAPER, fg=INK, relief='flat', padx=18, pady=16, undo=True, font=('Segoe UI', 12))
         editor.pack(fill='x')
         editor.insert('1.0', self.draft)
@@ -334,7 +335,10 @@ class App(tk.Tk):
             editor.delete('1.0', 'end')
             self.draft = ''
             status.configure(text='Saved to your notebook.')
+            suggestions[:] = choose_suggestions(self.store.words(), [w['id'] for w in suggestions])
+            suggestion_label.configure(text='TRY USING:  ' + '  ·  '.join(w['word'] for w in suggestions))
             refresh()
+            editor.focus_set()
         self.button(row, 'Save entry', save).pack(side='left', padx=(0, 15))
         status.pack(side='left')
         self.label(self.content, 'YOUR PREVIOUS ENTRIES', 9, MUTED, bold=True).pack(anchor='w', pady=(12, 10))
