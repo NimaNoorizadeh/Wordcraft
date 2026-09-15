@@ -32,6 +32,18 @@ def default_database_path():
     return data_directory / 'vocabulary.db'
 
 
+def format_review_reveal(word, mode):
+    """Return the heading and comparison text for a revealed review card."""
+    phrase = word['phrase'].strip()
+    heading = word['word']
+    if phrase and phrase.casefold() != word['word'].strip().casefold():
+        heading += '  ·  ' + phrase
+    examples = word['example'].strip()
+    if mode == 'express':
+        return heading, examples
+    return heading, '\n'.join(part for part in (word['meaning'].strip(), examples) if part)
+
+
 # tk.Tk is Tkinter's main application window.
 
 class App(tk.Tk):
@@ -301,8 +313,10 @@ class App(tk.Tk):
 
         def reveal():
             reveal_button.destroy()
-            self.label(card, w['word'] + '  ·  ' + w['phrase'], 16, GREEN, bold=True, wraplength=680).pack(anchor='w', pady=(8, 4))
-            self.label(card, w['meaning'] + '\n' + w['example'], 11, wraplength=680).pack(anchor='w', pady=(0, 9))
+            heading, details = format_review_reveal(w, self.mode)
+            self.label(card, heading, 16, GREEN, bold=True, wraplength=680).pack(anchor='w', pady=(8, 4))
+            if details:
+                self.label(card, details, 11, wraplength=680).pack(anchor='w', pady=(0, 9))
             row = tk.Frame(card, bg=PAPER)
             row.pack(fill='x', pady=(14, 0))
             for rating, name in [('again', 'Again'), ('hard', 'Hard'), ('good', 'Good'), ('easy', 'Easy')]:
