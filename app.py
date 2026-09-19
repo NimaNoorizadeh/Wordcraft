@@ -301,9 +301,27 @@ class App(tk.Tk):
         w = self.queue[self.review_index]
         self.page('Practice', 'Find the words.', f"{'Expression' if self.mode == 'express' else 'Understanding'}  ·  {self.review_index + 1} / {len(self.queue)}", show_name=False)
         card = self.card()
+        responsive_labels = []
+
+        def current_wrap_width():
+            width = card.winfo_width()
+            return max(360, width - 56) if width > 100 else 680
+
+        def responsive_label(text, size=11, **options):
+            label = self.label(card, text, size, wraplength=current_wrap_width(), **options)
+            responsive_labels.append(label)
+            return label
+
+        def resize_review_text(event):
+            wrap_width = max(360, event.width - 56)
+            for label in responsive_labels:
+                if label.winfo_exists():
+                    label.configure(wraplength=wrap_width)
+
+        card.bind('<Configure>', resize_review_text)
         self.label(card, 'RECALL BEFORE YOU REVEAL', 9, GREEN, bold=True).pack(anchor='w')
-        self.label(card, w['meaning'] if self.mode == 'express' else w['word'], 22, bold=True, wraplength=680).pack(anchor='w', pady=(12, 10))
-        self.label(card, w['prompt'] if self.mode == 'express' else 'What does this mean? Explain it in your own words.', 11, MUTED, wraplength=680).pack(anchor='w', pady=(0, 12))
+        responsive_label(w['meaning'] if self.mode == 'express' else w['word'], 22, bold=True).pack(anchor='w', pady=(12, 10))
+        responsive_label(w['prompt'] if self.mode == 'express' else 'What does this mean? Explain it in your own words.', 11, fg=MUTED).pack(anchor='w', pady=(0, 12))
         self.label(card, 'Write your answer, or say it aloud before checking.', 10, MUTED).pack(anchor='w')
         answer = tk.Text(card, height=3, wrap='word', bg=BG, fg=INK, relief='flat', padx=12, pady=10, font=('Segoe UI', 12))
         answer.pack(fill='x', pady=10)
@@ -314,9 +332,9 @@ class App(tk.Tk):
         def reveal():
             reveal_button.destroy()
             heading, details = format_review_reveal(w, self.mode)
-            self.label(card, heading, 16, GREEN, bold=True, wraplength=680).pack(anchor='w', pady=(8, 4))
+            responsive_label(heading, 16, fg=GREEN, bold=True).pack(anchor='w', pady=(8, 4))
             if details:
-                self.label(card, details, 11, wraplength=680).pack(anchor='w', pady=(0, 9))
+                responsive_label(details, 11).pack(anchor='w', pady=(0, 9))
             row = tk.Frame(card, bg=PAPER)
             row.pack(fill='x', pady=(14, 0))
             for rating, name in [('again', 'Again'), ('hard', 'Hard'), ('good', 'Good'), ('easy', 'Easy')]:

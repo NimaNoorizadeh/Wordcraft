@@ -28,6 +28,21 @@ with tempfile.TemporaryDirectory() as folder:
 
         before = [widget.cget('text') for widget in descendants(app.content) if isinstance(widget, tk.Label)]
         assert before.count(meaning) == 1
+        meaning_label = next(widget for widget in descendants(app.content)
+                             if isinstance(widget, tk.Label) and widget.cget('text') == meaning)
+        normal_wrap = int(meaning_label.cget('wraplength'))
+        assert normal_wrap > 680, normal_wrap
+
+        app.geometry('1600x900')
+        app.update()
+        wide_wrap = int(meaning_label.cget('wraplength'))
+        assert wide_wrap > normal_wrap, (normal_wrap, wide_wrap)
+
+        app.geometry('960x730')
+        app.update()
+        narrow_wrap = int(meaning_label.cget('wraplength'))
+        assert 360 <= narrow_wrap < wide_wrap, (narrow_wrap, wide_wrap)
+
         reveal = next(widget for widget in descendants(app.content)
                       if isinstance(widget, tk.Button) and widget.cget('text') == 'Reveal & compare')
         reveal.invoke()
